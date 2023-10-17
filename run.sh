@@ -12,4 +12,5 @@
 
 # npx hardhat test --network hardhat test/the-rewarder/the-rewarder.challenge.js
 # npx hardhat test --network hardhat test/selfie/selfie.challenge.js
-npx hardhat test --network hardhat test/compromised/compromised.challenge.js
+# npx hardhat test --network hardhat test/compromised/compromised.challenge.js
+npx hardhat test --network hardhat test/puppet-v2/puppet-v2.challenge.js
