@@ -10,5 +10,5 @@
 # npx hardhat test --network hardhat test/side-entrance/side-entrance.challenge.js
 
 
-npx hardhat test --network hardhat test/the-rewarder/the-rewarder.challenge.js
-
+# npx hardhat test --network hardhat test/the-rewarder/the-rewarder.challenge.js
+npx hardhat test --network hardhat test/selfie/selfie.challenge.js
