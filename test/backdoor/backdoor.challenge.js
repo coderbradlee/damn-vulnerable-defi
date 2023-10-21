@@ -47,7 +47,7 @@ describe("[Challenge] Backdoor", function () {
 
   it("Execution", async function () {
     /** CODE YOUR SOLUTION HERE */
-    let testWalletRegistry = await (
+    await (
       await ethers.getContractFactory("testWalletRegistry", player)
     ).deploy(
       token.address,
@@ -57,88 +57,6 @@ describe("[Challenge] Backdoor", function () {
       walletFactory.address,
       walletRegistry.address
     );
-
-    //    await testFlashloanFreeRider.start();
-    // let datas;
-    // let signatures;
-    // for (let i = 0; i < 1; i++) {
-    //   // setup(
-    //   // address[] calldata _owners,
-    //   // uint256 _threshold,
-    //   // address to,
-    //   // bytes calldata data,
-    //   // address fallbackHandler,
-    //   // address paymentToken,
-    //   // uint256 payment,
-    //   // address payable paymentReceiver
-    //   let calldata = testWalletRegistry.interface.encodeFunctionData("setup", [
-    //     users,
-    //     0,
-    //     player.address,
-    //     "0x01",
-    //     player.address,
-    //     player.address,
-    //     0,
-    //     player.address,
-    //   ]);
-
-    //   //   GnosisSafeProxy proxy, address singleton, bytes calldata initializer, uint256)
-    //   let data = walletRegistry.interface.encodeFunctionData("proxyCreated", [
-    //     testWalletRegistry.address,
-    //     masterCopy.address,
-    //     calldata,
-    //     0,
-    //   ]);
-
-    //   //     getTransactionHash(
-    //   //     address to,
-    //   //     uint256 value,
-    //   //     bytes calldata data,
-    //   //     Enum.Operation operation,
-    //   //     uint256 safeTxGas,
-    //   //     uint256 baseGas,
-    //   //     uint256 gasPrice,
-    //   //     address gasToken,
-    //   //     address refundReceiver,
-    //   //     uint256 _nonce
-    //   // ) public view returns (bytes32)
-    //   let hash = walletFactory.getTransactionHash(
-    //     walletRegistry.address,
-    //     0,
-    //     data,
-    //     0,
-    //     1000000n,
-    //     1000000n,
-    //     0,
-    //     0x0,
-    //     player.address,
-    //     i
-    //   );
-    //   console.log("hash", hash.toString());
-    //   let signature = await player.signMessage(hash);
-    //   datas[i] = data;
-    //   signatures[i] = signature;
-    //   // function execTransaction(
-    //   // address to,
-    //   // uint256 value,
-    //   // bytes calldata data,
-    //   // Enum.Operation operation,
-    //   // uint256 safeTxGas,
-    //   // uint256 baseGas,
-    //   // uint256 gasPrice,
-    //   // address gasToken,
-    //   // address payable refundReceiver,
-    //   // bytes memory signatures
-    // //     function createProxyWithCallback(
-    // //     address _singleton,
-    // //     bytes memory initializer,
-    // //     uint256 saltNonce,
-    // //     IProxyCreationCallback callback
-    // // ) public returns (GnosisSafeProxy proxy)
-    // }
-
-    // await testWalletRegistry.connect(player).start();
-    // await testWalletRegistry.end();
   });
 
   after(async function () {
@@ -156,8 +74,8 @@ describe("[Challenge] Backdoor", function () {
       expect(await walletRegistry.beneficiaries(users[i])).to.be.false;
     }
     // Player must own all tokens
-    // expect(await token.balanceOf(player.address)).to.eq(
-    //   AMOUNT_TOKENS_DISTRIBUTED
-    // );
+    expect(await token.balanceOf(player.address)).to.eq(
+      AMOUNT_TOKENS_DISTRIBUTED
+    );
   });
 });

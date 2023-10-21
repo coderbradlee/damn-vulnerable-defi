@@ -10,11 +10,11 @@
 # npx hardhat test --network hardhat test/free-rider/free-rider.challenge.js
 
 #todo not finish
-# npx hardhat test --network hardhat test/backdoor/backdoor.challenge.js
+npx hardhat test --network hardhat test/backdoor/backdoor.challenge.js
 
 # //todo not finish
 # npx hardhat test --network hardhat test/climber/climber.challenge.js
 # //todo not finish
 # npx hardhat test --network hardhat test/wallet-mining/wallet-mining.challenge.js
 
- npx hardhat test --network hardhat test/abi-smuggling/abi-smuggling.challenge.js
+#  npx hardhat test --network hardhat test/abi-smuggling/abi-smuggling.challenge.js
